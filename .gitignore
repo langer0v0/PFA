@@ -1,0 +1,12 @@
+.settings/
+.vscode/
+
+*.log
+*.vcd
+*.dat
+*.o
+*.elf
+*.bin
+./OIRV/
+LAB/build/*
+
