@@ -2,6 +2,14 @@
 
 CUR_PATH=`pwd`
 
+cd $CUR_PATH
+
+
+if [ ! -d "OIRV" ]; then
+    git clone --depth=1 https://gitee.com/langer0v0/OIRV.git
+fi
+
+
 if [ -f "$CUR_PATH/oirv_model" ]; then
     echo "\033[32mEnvironment configuration completed OvO!\033[0m"
     make -C $CUR_PATH/LAB file SRC=display_image #  > $CUR_PATH/LAB/start.log
@@ -103,14 +111,6 @@ else
     # ./configure
     make -C ~/eda/verilator -j`nproc` 
     make install
-fi
-
-
-cd $CUR_PATH
-
-
-if [ ! -d "OIRV" ]; then
-    git clone --depth=1 https://gitee.com/langer0v0/OIRV.git
 fi
 
 
