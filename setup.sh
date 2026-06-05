@@ -1,9 +1,7 @@
 #!/bin/sh
 
-CUR_PATH=`pwd`
-
+CUR_PATH=$(dirname ${realpath $0})
 cd $CUR_PATH
-
 
 if [ ! -d "OIRV" ]; then
     git clone --depth=1 https://gitee.com/langer0v0/OIRV.git
