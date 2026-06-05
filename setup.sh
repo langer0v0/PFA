@@ -41,11 +41,13 @@ case "$PREFIX" in
         sudo dnf install clang -y
         sudo dnf install python -y
         sudo dnf install ffmpeg -y
+        sudo dnf install make -y
     else
         sudo apt-get install verilator -y
         sudo apt-get install clang -y
         sudo apt-get install python -y
         sudo apt-get install ffmpeg -y
+        sudo apt-get install make -y
 
         # ubuntu 2204
                     # sudo apt-get install -y --no-upgrade git
