@@ -18,13 +18,13 @@ model:
 
 bin: ./asm/${SRC}.s ./bin/*.im
 	mkdir -p build
-	clang -ffreestanding -nostdlib -nodefaultlibs ./asm/${SRC}.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/${SRC}.o
+	clang -nostdlib -nodefaultlibs ./asm/${SRC}.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/${SRC}.o
 	llvm-objcopy -S -O binary ./build/${SRC}.o ./build/${SRC}.bin
 
 
 ./build/${SRC}.bin: ./asm/${SRC}.s ./bin/*.im
 	mkdir -p build
-	clang -ffreestanding -nostdlib -nodefaultlibs ./asm/${SRC}.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/${SRC}.o
+	clang -nostdlib -nodefaultlibs ./asm/${SRC}.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/${SRC}.o
 	llvm-objcopy -S -O binary ./build/${SRC}.o ./build/${SRC}.bin
 
 
@@ -44,7 +44,7 @@ sym: ./build/${SRC}.bin
 asm: model
 	@mkdir -p build
 	python ./utils/asm2bin.py "${CODE}" ./build/mach.s
-	@clang -ffreestanding -nostdlib -nodefaultlibs ./build/mach.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/mach.o
+	@clang -nostdlib -nodefaultlibs ./build/mach.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/mach.o
 	@llvm-objcopy -S -O binary ./build/mach.o ./build/mach.bin
 	@../oirv_model ./build/mach.bin
 	
@@ -82,4 +82,4 @@ clean:
 	rm -rf ./build/* ../OIRV/test/obj_dir *.log *.rv
 	
 
-.PHONY: clean conv reg-map list im
+.PHONY: clean conv reg-map list im init sym dump 
