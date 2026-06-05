@@ -1,6 +1,7 @@
 #!/bin/sh
 
-CUR_PATH=$(dirname ${realpath $0})
+SCRIPT_PATH=$(readlink -f $0)
+CUR_PATH=$(dirname ${SCRIPT_PATH})
 cd $CUR_PATH
 
 if [ ! -d "OIRV" ]; then
