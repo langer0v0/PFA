@@ -77,9 +77,12 @@ init:
 	chmod +x ../setup.sh
 	. ../setup.sh
 
+new:
+	cp -n ./asm/start.s  ./asm/${SRC}.s
+
 
 clean:
 	rm -rf ./build/* ../OIRV/test/obj_dir *.log *.rv
 	
 
-.PHONY: clean conv reg-map list im init sym dump 
+.PHONY: clean conv reg-map list im init sym dump new
