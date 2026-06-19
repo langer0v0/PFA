@@ -67,6 +67,10 @@ make sym SRC=hello
 ```shell
 make im PIC=image0.png WIDTH=45
 ```
+8. 使用模板 LAB/asm/start.s 初始化一个汇编文件，由 SRC 指定名称，放在 LAB/asm 目录：
+```shell
+make new SRC=abc
+```
 
 ## 命令参数
 1. SRC：以汇编文件执行程序时，用于指定在 asm 目录当中要进行编译、运行的汇编文件名称（不需要带上后缀）；
