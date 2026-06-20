@@ -1,8 +1,10 @@
 SRC ?= hello
 VAL ?= 1
 CODE ?= 00000000000100000000000010010011
+FUNC ?= _start
 WIDTH ?= 45
 PIC ?= image0.png
+
 PIC_NAME = $(basename $(PIC))
 
 all: ./build/${SRC}.bin model
@@ -18,13 +20,13 @@ model:
 
 bin: ./asm/${SRC}.s ./bin/*.im
 	mkdir -p build
-	clang -nostdlib -nodefaultlibs ./asm/${SRC}.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/${SRC}.o
+	clang -ffreestanding -nostdlib -nodefaultlibs ./asm/${SRC}.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/${SRC}.o
 	llvm-objcopy -S -O binary ./build/${SRC}.o ./build/${SRC}.bin
 
 
 ./build/${SRC}.bin: ./asm/${SRC}.s ./bin/*.im
 	mkdir -p build
-	clang -nostdlib -nodefaultlibs ./asm/${SRC}.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/${SRC}.o
+	clang -ffreestanding -nostdlib -nodefaultlibs ./asm/${SRC}.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/${SRC}.o
 	llvm-objcopy -S -O binary ./build/${SRC}.o ./build/${SRC}.bin
 
 
@@ -34,7 +36,7 @@ run: ./build/${SRC}.bin model
 	
 
 dump: ./build/${SRC}.bin
-	llvm-objdump -s -d ./build/${SRC}.o
+	llvm-objdump -d --disassemble-symbols=${FUNC} ./build/${SRC}.o
 
 
 sym: ./build/${SRC}.bin
@@ -44,7 +46,7 @@ sym: ./build/${SRC}.bin
 asm: model
 	@mkdir -p build
 	python ./utils/asm2bin.py "${CODE}" ./build/mach.s
-	@clang -nostdlib -nodefaultlibs ./build/mach.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/mach.o
+	@clang -ffreestanding -nostdlib -nodefaultlibs ./build/mach.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/mach.o
 	@llvm-objcopy -S -O binary ./build/mach.o ./build/mach.bin
 	@../oirv_model ./build/mach.bin
 	
@@ -77,6 +79,7 @@ init:
 	chmod +x ../setup.sh
 	. ../setup.sh
 
+
 new:
 	cp -n ./asm/start.s  ./asm/${SRC}.s
 
@@ -85,4 +88,4 @@ clean:
 	rm -rf ./build/* ../OIRV/test/obj_dir *.log *.rv
 	
 
-.PHONY: clean conv reg-map list im init sym dump new
+.PHONY: clean conv reg-map list im new
