@@ -15,7 +15,7 @@ main:
     # j stop
 
 
-.include "./ASM/basic.s"
+.include "./asm/basic.s"
 '''
 
 def info_print(text):
