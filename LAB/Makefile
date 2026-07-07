@@ -7,6 +7,16 @@ PIC ?= image0.png
 
 PIC_NAME = $(basename $(PIC))
 
+
+ifneq ($(wildcard c/$(SRC).c),)
+  SRC_FILE = c/start.S $(wildcard c/$(SRC).c)
+  LINK_OPT = -Wl,-T c/bare.lds
+else
+  SRC_FILE = $(wildcard asm/$(SRC).s)
+  LINK_OPT = -Wl,-Ttext=0x80000000
+endif
+
+
 all: ./build/${SRC}.bin model
 	mkdir -p build
 	../oirv_model ./build/${SRC}.bin
@@ -18,15 +28,15 @@ model:
 	@chmod +x ../oirv_model
 
 
-bin: ./asm/${SRC}.s ./bin/*.im
+bin: ${SRC_FILE} ./bin/*.im
 	mkdir -p build
-	clang -ffreestanding -nostdlib -nodefaultlibs ./asm/${SRC}.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/${SRC}.o
+	clang -ffreestanding -nostdlib -nodefaultlibs ${SRC_FILE} ${LINK_OPT} -target riscv64 -march=rv64im -o ./build/${SRC}.o
 	llvm-objcopy -S -O binary ./build/${SRC}.o ./build/${SRC}.bin
 
 
-./build/${SRC}.bin: ./asm/${SRC}.s ./bin/*.im
+./build/${SRC}.bin: ${SRC_FILE} ./bin/*.im
 	mkdir -p build
-	clang -ffreestanding -nostdlib -nodefaultlibs ./asm/${SRC}.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/${SRC}.o
+	clang -ffreestanding -nostdlib -nodefaultlibs ${SRC_FILE} ${LINK_OPT} -target riscv64 -march=rv64im -o ./build/${SRC}.o
 	llvm-objcopy -S -O binary ./build/${SRC}.o ./build/${SRC}.bin
 
 
@@ -46,7 +56,7 @@ sym: ./build/${SRC}.bin
 asm: model
 	@mkdir -p build
 	python ./utils/asm2bin.py "${CODE}" ./build/mach.s
-	@clang -ffreestanding -nostdlib -nodefaultlibs ./build/mach.s -Wl,-Ttext=0x80000000 -target riscv64 -march=rv64im -o ./build/mach.o
+	@clang -ffreestanding -nostdlib -nodefaultlibs ./build/mach.s ${LINK_OPT} -target riscv64 -march=rv64im -o ./build/mach.o
 	@llvm-objcopy -S -O binary ./build/mach.o ./build/mach.bin
 	@../oirv_model ./build/mach.bin
 	
@@ -82,6 +92,10 @@ init:
 
 new:
 	cp -n ./asm/start.s  ./asm/${SRC}.s
+
+
+new-c:
+	cp -n ./c/basic.c  ./c/${SRC}.c
 
 
 clean:
