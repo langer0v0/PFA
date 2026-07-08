@@ -4,22 +4,33 @@ CODE ?= 00000000000100000000000010010011
 FUNC ?= _start
 WIDTH ?= 45
 PIC ?= image0.png
+PLATFORM ?= OIRV
 
 PIC_NAME = $(basename $(PIC))
-
+LINK_OPT = -ffreestanding -nostdlib -nodefaultlibs -target riscv64 -march=rv64im 
+RUN_CMD := ../oirv_model ./build/${SRC}.bin
+OBJ = ./build/${SRC}
 
 ifneq ($(wildcard c/$(SRC).c),)
   SRC_FILE = c/start.S $(wildcard c/$(SRC).c)
-  LINK_OPT = -Wl,-T c/bare.lds
+  LINK_OPT += -Wl,-T c/bare.lds
 else
   SRC_FILE = $(wildcard asm/$(SRC).s)
-  LINK_OPT = -Wl,-Ttext=0x80000000
+  LINK_OPT += -Wl,-Ttext=0x80000000
 endif
 
 
-all: ./build/${SRC}.bin model
+ifneq ($(PLATFORM),OIRV)
+  SRC_FILE = $(wildcard c/$(SRC).c)
+  LINK_OPT = -Wall
+  RUN_CMD = ./build/${SRC}-${PLATFORM}.o
+  OBJ = ./build/${SRC}-${PLATFORM}
+endif
+
+
+all: ${OBJ}.bin model
 	mkdir -p build
-	../oirv_model ./build/${SRC}.bin
+	${RUN_CMD}
 
 
 model:
@@ -30,33 +41,33 @@ model:
 
 bin: ${SRC_FILE} ./bin/*.im
 	mkdir -p build
-	clang -ffreestanding -nostdlib -nodefaultlibs ${SRC_FILE} ${LINK_OPT} -target riscv64 -march=rv64im -o ./build/${SRC}.o
-	llvm-objcopy -S -O binary ./build/${SRC}.o ./build/${SRC}.bin
+	clang ${SRC_FILE} ${LINK_OPT} -o ${OBJ}.o
+	llvm-objcopy -S -O binary ${OBJ}.o ${OBJ}.bin
 
 
-./build/${SRC}.bin: ${SRC_FILE} ./bin/*.im
+${OBJ}.bin: ${SRC_FILE} ./bin/*.im
 	mkdir -p build
-	clang -ffreestanding -nostdlib -nodefaultlibs ${SRC_FILE} ${LINK_OPT} -target riscv64 -march=rv64im -o ./build/${SRC}.o
-	llvm-objcopy -S -O binary ./build/${SRC}.o ./build/${SRC}.bin
+	clang ${SRC_FILE} ${LINK_OPT} -o ${OBJ}.o
+	llvm-objcopy -S -O binary ${OBJ}.o ${OBJ}.bin
 
 
-run: ./build/${SRC}.bin model
+run: ${OBJ}.bin model
 	mkdir -p build
-	@../oirv_model ./build/${SRC}.bin
+	@../oirv_model ${OBJ}.bin
 	
 
-dump: ./build/${SRC}.bin
-	llvm-objdump -d --disassemble-symbols=${FUNC} ./build/${SRC}.o
+dump: ${OBJ}.bin
+	llvm-objdump -d --disassemble-symbols=${FUNC} ${OBJ}.o
 
 
-sym: ./build/${SRC}.bin
-	llvm-nm ./build/${SRC}.o
+sym: ${OBJ}.bin
+	llvm-nm ${OBJ}.o
 
 
 asm: model
 	@mkdir -p build
 	python ./utils/asm2bin.py "${CODE}" ./build/mach.s
-	@clang -ffreestanding -nostdlib -nodefaultlibs ./build/mach.s ${LINK_OPT} -target riscv64 -march=rv64im -o ./build/mach.o
+	@clang ./build/mach.s ${LINK_OPT} -o ./build/mach.o
 	@llvm-objcopy -S -O binary ./build/mach.o ./build/mach.bin
 	@../oirv_model ./build/mach.bin
 	
@@ -97,9 +108,11 @@ new:
 new-c:
 	cp -n ./c/basic.c  ./c/${SRC}.c
 
-
 clean:
+	rm -rf ./build/* *.log *.rv
+
+clean-all:
 	rm -rf ./build/* ../OIRV/test/obj_dir *.log *.rv
 	
 
-.PHONY: clean conv reg-map list im new
+.PHONY: clean clean-all conv reg-map list im new
