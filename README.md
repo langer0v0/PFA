@@ -42,41 +42,46 @@ make FILE=coremark50
 make SRC=return # 显示执行信息
 make SRC=return 1> a.log # 不显示任何其他执行信息
 ```
-2. 数制转换：
+2. 使用本机执行 C 语言程序时，可以使用以下方式：
+```shell
+# cd LAB
+make SRC=return PLATFORM=pc # 显示执行信息
+make SRC=return PLATFORM=pc 1> a.log # 不显示任何其他执行信息
+```
+3. 数制转换：
 ```shell
 # cd LAB
 make conv VAL=0o10101
 ```
-
-3. 显示 RISC-V 架构的通用寄存器与别名：
+4. 显示 RISC-V 架构的通用寄存器与别名：
 ```shell
 # cd LAB
 make reg-map
 ```
-4. 显示所有可以执行的汇编代码：
+5. 显示所有可以执行的汇编代码：
 ```shell
 # cd LAB
 make list
 ```
-5. 对编译生成的可执行文件进行反汇编（FUNC 参数可指定标号，默认指定：_start）：
+6. 对编译生成的可执行文件进行反汇编（FUNC 参数可指定标号，默认指定：_start）：
 ```shell
 # cd LAB
 make dump FUNC=_start SRC=hello
 ```
-6. 读取可执行文件的符号（标号）信息：
+7. 读取可执行文件的符号（标号）信息：
 ```shell
 # cd LAB
 make sym SRC=hello
 ```
-7. 将一张图片等比例缩放到指定宽度，并转换为 OIRV 可处理的 RGB24 格式（注意：长与宽都不得大于 255；指定 PIC 参数时，需要输入后缀）：
+8. 将一张图片等比例缩放到指定宽度，并转换为 OIRV 可处理的 RGB24 格式（注意：长与宽都不得大于 255；指定 PIC 参数时，需要输入后缀）：
 ```shell
 make im PIC=image0.png WIDTH=45
 ```
-8. 使用模板 LAB/asm/start.s 初始化一个汇编文件，由 SRC 指定名称，放在 LAB/asm 目录：
+9. 使用模板 LAB/asm/start.s 初始化一个汇编文件，由 SRC 指定名称，放在 LAB/asm 目录：
 ```shell
 make new SRC=abc
 ```
-9. 使用模板 LAB/c/basic.c 初始化一个汇编文件，由 SRC 指定名称，放在 LAB/c 目录：
+10. 使用模板 LAB/c/basic.c 初始化一个汇编文件，由 SRC 指定名称，放在 LAB/c 目录：
 ```shell
 make new-c SRC=abc
 ```
@@ -87,7 +92,8 @@ make new-c SRC=abc
 3. VAL：进行进制转换时，指定需要转换的数字，可以为二进制、八进制、十进制或十六进制；
 4. PIC：获取 RGB24 格式的图像数据时，指定文件的名称（文件需要存放在 image 目录下，并且指定名称时需要带上后缀）。
 5. FUNC：指定进行反编译的标号，默认指定：_start。
-6. 
+6. PLATFORM：指定运行 C 语言程序的平台（默认为 OIRV），若需要在本机运行，可指定该参数为 pc。
+
 ## 项目结构
 1. LAB 目录包括了所有实验代码：
 - asm 目录：存放最基础的 OIRV 启动汇编代码以及演示性质的代码，其中 basic.s 提供了结束程序运行的代码，不可修改它们；start.s 提供了一个最简单的代码模板，将它复制以后，可以书写自己的实验代码；其他汇编代码为演示代码；
