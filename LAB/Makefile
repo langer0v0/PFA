@@ -108,6 +108,11 @@ new:
 new-c:
 	cp -n ./c/basic.c  ./c/${SRC}.c
 
+
+ops:
+	@python utils/operators.py
+
+
 clean:
 	rm -rf ./build/* *.log *.rv
 
@@ -115,4 +120,4 @@ clean-all:
 	rm -rf ./build/* ../OIRV/test/obj_dir *.log *.rv
 	
 
-.PHONY: clean clean-all conv reg-map list im new
+.PHONY: clean clean-all conv reg-map list im new new-c ops
